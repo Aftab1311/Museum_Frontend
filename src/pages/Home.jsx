@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import LazyImage from "../components/LazyImage";
 
-import homeImg from "../assets/Home.png";
+import homeImg from "../assets/Home.webp";
 import city1 from "../assets/city1.jpg";
 import culture2 from "../assets/culture1.webp";
 import culture1 from "../assets/culture5.webp";
@@ -166,6 +166,8 @@ export function Home() {
             src={homeImg}
             alt="Nigerian Culture"
             className="w-full h-full object-cover"
+            loading="eager"
+            fetchPriority="high"
             referrerPolicy="no-referrer"
           />
           <div className="absolute inset-0 bg-black/40" />
