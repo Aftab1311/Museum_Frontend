@@ -1,6 +1,6 @@
 // src/context/ArtifactContext.jsx
 import { createContext, useContext, useState, useEffect } from "react";
-import { getArtifacts } from "@/src/services/artifactService";
+import { getArtifacts } from "../services/artifactService";
 
 const ArtifactContext = createContext();
 

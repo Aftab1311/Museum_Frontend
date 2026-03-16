@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { motion } from "motion/react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Search, SlidersHorizontal, ChevronDown } from "lucide-react";
-import { useArtifacts } from "@/src/context/ArtifactContext";
+import { useArtifacts } from "../context/ArtifactContext";
 const ARTIFACTS_PER_PAGE = 4;
 
 export function Gallery() {

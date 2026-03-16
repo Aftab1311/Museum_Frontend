@@ -25,7 +25,7 @@ import music from "../assets/music.webp";
 import artifacts from "../assets/artifacts.webp";
 import festivals from "../assets/festival1.png";
 import independence from "../assets/independence.webp";
-import { useArtifacts } from "@/src/context/ArtifactContext";
+import { useArtifacts } from "../context/ArtifactContext";
 
 const CATEGORIES = [
   {
@@ -126,7 +126,11 @@ export function Home() {
   const [activeEra, setActiveEra] = useState(0);
   const { artifacts, loading, error } = useArtifacts();
 
-   if (loading) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  if (loading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -145,11 +149,8 @@ export function Home() {
       </div>
     );
   }
-  const featuredArtifacts = artifacts.slice(0, 3);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  const featuredArtifacts = artifacts.slice(0, 3);
 
   return (
     <motion.div

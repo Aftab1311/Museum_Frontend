@@ -7,9 +7,9 @@ import {
   createArtifact,
   updateArtifact,
   deleteArtifact,
-} from "@/src/services/artifactService";
+} from "../services/artifactService";
 
-import { useArtifacts } from "@/src/context/ArtifactContext";
+import { useArtifacts } from "../context/ArtifactContext";
 
 const baseURL = import.meta.env.VITE_API_URL;
 

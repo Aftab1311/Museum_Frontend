@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { ArrowLeft, Calendar, MapPin, Tag, Layers } from "lucide-react";
 import { useEffect } from "react";
-import { useArtifacts } from "@/src/context/ArtifactContext";
+import { useArtifacts } from "../context/ArtifactContext";
 
 export function ArtifactDetail() {
   const { id } = useParams();

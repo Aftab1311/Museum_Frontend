@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Landmark } from "lucide-react";
 import { useState } from "react";
-import { cn } from "@/src/lib/utils";
+import { cn } from "../lib/utils";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);

@@ -1,13 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Layout } from "@/src/components/Layout";
-import { Home } from "@/src/pages/Home";
-import { Gallery } from "@/src/pages/Gallery";
-import { ArtifactDetail } from "@/src/pages/ArtifactDetail";
-import { Admin } from "@/src/pages/Admin";
-import { Login } from "@/src/pages/Login";
-import { Map } from "@/src/pages/Map";
-import { History } from "@/src/pages/History";
-import { ArtifactProvider } from "@/src/context/ArtifactContext";
+import { Layout } from "../src/components/Layout";
+import { Home } from "../src/pages/Home";
+import { Gallery } from "../src/pages/Gallery";
+import { ArtifactDetail } from "../src/pages/ArtifactDetail";
+import { Admin } from "../src/pages/Admin";
+import { Login } from "../src/pages/Login";
+import { Map } from "../src/pages/Map";
+import { History } from "../src/pages/History";
+import { ArtifactProvider } from "../src/context/ArtifactContext";
 
 export default function App() {
   return (
