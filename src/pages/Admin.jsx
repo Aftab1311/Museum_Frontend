@@ -13,7 +13,7 @@ import { useArtifacts } from "../context/ArtifactContext";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
-export function Admin() {
+export default function Admin() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("artifacts");
   const [loading, setLoading] = useState(true);

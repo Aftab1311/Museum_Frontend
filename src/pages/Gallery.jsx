@@ -5,7 +5,7 @@ import { Search, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { useArtifacts } from "../context/ArtifactContext";
 const ARTIFACTS_PER_PAGE = 4;
 
-export function Gallery() {
+export default function Gallery() {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryFilter = searchParams.get("category");
 

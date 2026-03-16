@@ -122,7 +122,7 @@ const TIMELINE_DATA = [
   },
 ];
 
-export function Home() {
+export default function Home() {
   const [activeEra, setActiveEra] = useState(0);
   const { artifacts, loading, error } = useArtifacts();
 
@@ -130,25 +130,25 @@ export function Home() {
     window.scrollTo(0, 0);
   }, []);
 
-  if (loading) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="min-h-screen flex items-center justify-center"
-      >
-        <div className="w-12 h-12 border-4 border-[#5A5A40] border-t-transparent rounded-full animate-spin"></div>
-      </motion.div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <motion.div
+  //       initial={{ opacity: 0 }}
+  //       animate={{ opacity: 1 }}
+  //       className="min-h-screen flex items-center justify-center"
+  //     >
+  //       <div className="w-12 h-12 border-4 border-[#5A5A40] border-t-transparent rounded-full animate-spin"></div>
+  //     </motion.div>
+  //   );
+  // }
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-600">
-        Error loading artifacts: {error}
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center text-red-600">
+  //       Error loading artifacts: {error}
+  //     </div>
+  //   );
+  // }
 
   const featuredArtifacts = artifacts.slice(0, 3);
 

@@ -6,7 +6,7 @@ import axios from "axios";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
-export function Login() {
+export default function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: ""

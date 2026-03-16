@@ -4,7 +4,7 @@ import { ArrowLeft, Calendar, MapPin, Tag, Layers } from "lucide-react";
 import { useEffect } from "react";
 import { useArtifacts } from "../context/ArtifactContext";
 
-export function ArtifactDetail() {
+export default function ArtifactDetail() {
   const { id } = useParams();
   const { artifacts, loading } = useArtifacts();
   

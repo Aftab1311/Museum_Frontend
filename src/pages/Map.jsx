@@ -66,7 +66,7 @@ const REGIONS = [
 
 
 
-export function Map() {
+export default function Map() {
   const [activeRegion, setActiveRegion] = useState(null);
 
   useEffect(() => {

@@ -33,7 +33,7 @@ const TIMELINE_DATA = [
   { year: "2023 - Present", title: "Tinubu Administration", desc: "Bola Ahmed Tinubu became president, focusing on economic reforms, currency restructuring, and policies aimed at stabilizing Nigeria’s economy.", img: img13 },
 ];
 
-export function History() {
+export default function History() {
   const containerRef = useRef(null);
 
   useEffect(() => {
