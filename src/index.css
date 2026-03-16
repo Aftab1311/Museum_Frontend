@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-cultural-bg: #f5f5f0;
+  --color-cultural-olive: #5A5A40;
+  --color-cultural-olive-dark: #42422f;
+  --color-cultural-ink: #2c2c1e;
+  --color-cultural-sand: #e8e8e0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-cultural-bg);
+  color: var(--color-cultural-ink);
+}
+
+h1, h2, h3, h4, h5, h6, .font-serif {
+  font-family: var(--font-serif);
+}
+
+.olive-button {
+  background-color: var(--color-cultural-olive);
+  color: white;
+  border-radius: 9999px;
+  padding: 12px 24px;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s ease;
+}
+
+.olive-button:hover {
+  background-color: var(--color-cultural-olive-dark);
+}
+
+.pill-image {
+  border-radius: 9999px;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+}
+
+.card {
+  background-color: #FFFFFF;
+  border-radius: 32px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+}
