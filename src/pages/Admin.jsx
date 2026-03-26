@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { Plus, Edit2, Trash2 } from "lucide-react";
@@ -8,15 +8,15 @@ import {
   updateArtifact,
   deleteArtifact,
 } from "../services/artifactService";
+import { getUsers } from "../services/adminService";
 
 import { useArtifacts } from "../context/ArtifactContext";
 
 const baseURL = import.meta.env.VITE_API_URL;
-
+const ARTIFACTS_PER_PAGE = 10;
 export default function Admin() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("artifacts");
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingArtifact, setEditingArtifact] = useState(null);
@@ -28,6 +28,11 @@ export default function Admin() {
   const [editFileName, setEditFileName] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersError, setUsersError] = useState("");
+  const [hasLoadedUsers, setHasLoadedUsers] = useState(false);
+  const [artifactsPage, setArtifactsPage] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -101,6 +106,76 @@ export default function Admin() {
 
     verifyAdmin();
   }, [navigate]);
+
+  useEffect(() => {
+    if (!isAuthorized || activeTab !== "users" || hasLoadedUsers) return;
+
+    const fetchUsers = async () => {
+      setUsersLoading(true);
+      setUsersError("");
+
+      try {
+        const fetchedUsers = await getUsers();
+        setUsers(fetchedUsers);
+        setHasLoadedUsers(true);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setUsersError("Unable to load users right now.");
+      } finally {
+        setUsersLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [isAuthorized, activeTab, hasLoadedUsers]);
+
+  const categories = useMemo(() => {
+    const categoriesMap = new Map();
+
+    artifacts.forEach((artifact) => {
+      const categoryName =
+        artifact.category && artifact.category.trim()
+          ? artifact.category.trim()
+          : "Uncategorized";
+
+      if (!categoriesMap.has(categoryName)) {
+        categoriesMap.set(categoryName, {
+          name: categoryName,
+          count: 0,
+          tribes: new Set(),
+        });
+      }
+
+      const entry = categoriesMap.get(categoryName);
+      entry.count += 1;
+      if (artifact.originTribe) {
+        entry.tribes.add(artifact.originTribe);
+      }
+    });
+
+    return Array.from(categoriesMap.values())
+      .map((entry) => ({
+        ...entry,
+        tribesCount: entry.tribes.size,
+      }))
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  }, [artifacts]);
+
+  const totalArtifactPages = Math.max(
+    1,
+    Math.ceil(artifacts.length / ARTIFACTS_PER_PAGE),
+  );
+
+  const paginatedArtifacts = useMemo(() => {
+    const start = (artifactsPage - 1) * ARTIFACTS_PER_PAGE;
+    return artifacts.slice(start, start + ARTIFACTS_PER_PAGE);
+  }, [artifacts, artifactsPage]);
+
+  useEffect(() => {
+    if (artifactsPage > totalArtifactPages) {
+      setArtifactsPage(totalArtifactPages);
+    }
+  }, [artifactsPage, totalArtifactPages]);
 
   // Handle form change for add modal
   const handleChange = (e) => {
@@ -336,7 +411,7 @@ export default function Admin() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-cultural-sand">
-                        {artifacts.map((artifact) => (
+                        {paginatedArtifacts.map((artifact) => (
                           <tr
                             key={artifact.id}
                             className="hover:bg-[#f5f5f0]/50 transition-colors"
@@ -390,12 +465,176 @@ export default function Admin() {
                       </tbody>
                     </table>
                   </div>
+
+                  {artifacts.length > ARTIFACTS_PER_PAGE && (
+                    <div className="mt-6 flex items-center justify-between">
+                      <p className="text-xs uppercase tracking-widest text-[#5A5A40]">
+                        Page {artifactsPage} of {totalArtifactPages}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setArtifactsPage((prev) => Math.max(1, prev - 1))
+                          }
+                          disabled={artifactsPage === 1}
+                          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest border border-cultural-sand text-[#5A5A40] hover:bg-cultural-sand transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Previous
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setArtifactsPage((prev) =>
+                              Math.min(totalArtifactPages, prev + 1),
+                            )
+                          }
+                          disabled={artifactsPage === totalArtifactPages}
+                          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest border border-cultural-sand text-[#5A5A40] hover:bg-cultural-sand transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-              {activeTab !== "artifacts" && (
+              {activeTab === "categories" && (
+                <div>
+                  <h2 className="text-2xl font-serif text-cultural-ink mb-2">
+                    Categories
+                  </h2>
+                  <p className="text-sm text-[#5A5A40] mb-6">
+                    All categories currently added to your collection.
+                  </p>
+
+                  {artifactsLoading ? (
+                    <div className="min-h-[180px] flex items-center justify-center">
+                      <div className="w-8 h-8 border-4 border-cultural-ink/20 border-t-cultural-ink rounded-full animate-spin"></div>
+                    </div>
+                  ) : categories.length === 0 ? (
+                    <div className="text-center py-14 border border-dashed border-cultural-sand rounded-2xl">
+                      <p className="text-[#5A5A40] font-medium uppercase tracking-widest text-xs">
+                        No categories available yet
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-cultural-sand">
+                            <th className="pb-4 text-xs font-bold uppercase tracking-widest text-[#5A5A40]">
+                              Category
+                            </th>
+                            <th className="pb-4 text-xs font-bold uppercase tracking-widest text-[#5A5A40]">
+                              Artifacts
+                            </th>
+                            <th className="pb-4 text-xs font-bold uppercase tracking-widest text-[#5A5A40]">
+                              Tribes
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-cultural-sand">
+                          {categories.map((category) => (
+                            <tr
+                              key={category.name}
+                              className="hover:bg-[#f5f5f0]/50 transition-colors"
+                            >
+                              <td className="py-4">
+                                <span className="px-3 py-1 bg-cultural-sand rounded-full text-[10px] font-bold uppercase tracking-wider text-[#5A5A40]">
+                                  {category.name}
+                                </span>
+                              </td>
+                              <td className="py-4 text-sm text-cultural-ink">
+                                {category.count}
+                              </td>
+                              <td className="py-4 text-sm text-cultural-ink">
+                                {category.tribesCount}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+              {activeTab === "users" && (
+                <div>
+                  <h2 className="text-2xl font-serif text-cultural-ink mb-2">
+                    Users
+                  </h2>
+                  <p className="text-sm text-[#5A5A40] mb-6">
+                    All available users currently in the system.
+                  </p>
+
+                  {usersLoading ? (
+                    <div className="min-h-[180px] flex items-center justify-center">
+                      <div className="w-8 h-8 border-4 border-cultural-ink/20 border-t-cultural-ink rounded-full animate-spin"></div>
+                    </div>
+                  ) : usersError ? (
+                    <div className="text-center py-14 border border-dashed border-cultural-sand rounded-2xl">
+                      <p className="text-[#5A5A40] font-medium uppercase tracking-widest text-xs">
+                        {usersError}
+                      </p>
+                    </div>
+                  ) : users.length === 0 ? (
+                    <div className="text-center py-14 border border-dashed border-cultural-sand rounded-2xl">
+                      <p className="text-[#5A5A40] font-medium uppercase tracking-widest text-xs">
+                        No users added yet
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-cultural-sand">
+                            <th className="pb-4 text-xs font-bold uppercase tracking-widest text-[#5A5A40]">
+                              Name
+                            </th>
+                            <th className="pb-4 text-xs font-bold uppercase tracking-widest text-[#5A5A40]">
+                              Email
+                            </th>
+                            <th className="pb-4 text-xs font-bold uppercase tracking-widest text-[#5A5A40]">
+                              Role
+                            </th>
+                            <th className="pb-4 text-xs font-bold uppercase tracking-widest text-[#5A5A40]">
+                              Status
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-cultural-sand">
+                          {users.map((user) => (
+                            <tr
+                              key={user.id}
+                              className="hover:bg-[#f5f5f0]/50 transition-colors"
+                            >
+                              <td className="py-4 font-serif text-cultural-ink">
+                                {user.name}
+                              </td>
+                              <td className="py-4 text-sm text-cultural-ink/80">
+                                {user.email}
+                              </td>
+                              <td className="py-4">
+                                <span className="px-3 py-1 bg-cultural-sand rounded-full text-[10px] font-bold uppercase tracking-wider text-[#5A5A40]">
+                                  {user.role}
+                                </span>
+                              </td>
+                              <td className="py-4 text-sm text-cultural-ink">
+                                {user.isActive ? "Active" : "Inactive"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+              {activeTab === "settings" && (
                 <div className="text-center py-24">
                   <p className="text-[#5A5A40] font-medium uppercase tracking-widest text-sm">
-                    {activeTab} management coming soon
+                    settings management coming soon
                   </p>
                 </div>
               )}

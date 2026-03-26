@@ -1,4 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL;
+let inFlightArtifactsRequest = null;
+let cachedArtifacts = null;
 
 // Helper function to get the current token
 const getToken = () => {
@@ -14,32 +16,48 @@ const handleResponse = async (response) => {
   return response.json();
 };
 
-export const getArtifacts = async () => {
-  try {
-    const token = getToken();
-    
-    const res = await fetch(`${API_URL}/artifacts`, {
-      headers: {
-        'Authorization': token ? `Bearer ${token}` : '',
-        'Content-Type': 'application/json',
-      },
-    });
-
-    const data = await handleResponse(res);
-    // The API returns an array directly
-    if (Array.isArray(data)) {
-      return data.map((artifact) => ({
-        ...artifact,
-        id: artifact._id, // Map _id to id for consistency
-      }));
-    } else {
-      console.warn("Unexpected API response format:", data);
-      return [];
-    }
-  } catch (error) {
-    console.error("Error fetching artifacts:", error);
-    throw error;
+export const getArtifacts = async (force = false) => {
+  if (!force && cachedArtifacts) {
+    return cachedArtifacts;
   }
+
+  if (!force && inFlightArtifactsRequest) {
+    return inFlightArtifactsRequest;
+  }
+
+  const token = getToken();
+
+  inFlightArtifactsRequest = (async () => {
+    try {
+      const res = await fetch(`${API_URL}/artifacts`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await handleResponse(res);
+      if (Array.isArray(data)) {
+        const normalized = data.map((artifact) => ({
+          ...artifact,
+          id: artifact._id,
+        }));
+        cachedArtifacts = normalized;
+        return normalized;
+      }
+
+      console.warn("Unexpected API response format:", data);
+      cachedArtifacts = [];
+      return [];
+    } catch (error) {
+      console.error("Error fetching artifacts:", error);
+      throw error;
+    } finally {
+      inFlightArtifactsRequest = null;
+    }
+  })();
+
+  return inFlightArtifactsRequest;
 };
 
 export const getArtifactById = async (id) => {
@@ -79,10 +97,12 @@ export const createArtifact = async (formData) => {
 
     const data = await handleResponse(res);
     
-    return {
+    const artifact = {
       ...data,
       id: data._id,
     };
+    cachedArtifacts = null;
+    return artifact;
   } catch (error) {
     console.error("Error creating artifact:", error);
     throw error;
@@ -103,10 +123,12 @@ export const updateArtifact = async (id, formData) => {
 
     const data = await handleResponse(res);
     
-    return {
+    const artifact = {
       ...data,
       id: data._id,
     };
+    cachedArtifacts = null;
+    return artifact;
   } catch (error) {
     console.error(`Error updating artifact ${id}:`, error);
     throw error;
@@ -125,7 +147,9 @@ export const deleteArtifact = async (id) => {
       },
     });
 
-    return await handleResponse(res);
+    const result = await handleResponse(res);
+    cachedArtifacts = null;
+    return result;
   } catch (error) {
     console.error(`Error deleting artifact ${id}:`, error);
     throw error;

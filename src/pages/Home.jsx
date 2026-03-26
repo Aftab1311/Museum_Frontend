@@ -162,13 +162,13 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative rounded-4xl overflow-hidden mb-24 h-[600px] flex items-center justify-center">
         <div className="absolute inset-0">
-          <img
+          <LazyImage
             src={homeImg}
             alt="Nigerian Culture"
             className="w-full h-full object-cover"
             loading="eager"
             fetchPriority="high"
-            referrerPolicy="no-referrer"
+            placeholderClassName="bg-cultural-sand"
           />
           <div className="absolute inset-0 bg-black/40" />
         </div>
@@ -425,11 +425,11 @@ export default function Home() {
                 className={`group relative overflow-hidden rounded-3xl ${getGridClass(i)}`}
               >
                 <div className="absolute inset-0 bg-[#2c2c1e]">
-                  <img
+                  <LazyImage
                     src={category.image}
                     alt={category.name}
                     className="w-full h-full object-cover opacity-60 group-hover:opacity-80 group-hover:scale-110 transition-all duration-700 ease-in-out"
-                    referrerPolicy="no-referrer"
+                    placeholderClassName="bg-cultural-sand/40"
                   />
 
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
@@ -492,11 +492,11 @@ export default function Home() {
               className="group flex flex-col"
             >
               <div className="relative overflow-hidden rounded-[2rem] mb-6 aspect-[3/4] bg-cultural-sand">
-                <img
+                <LazyImage
                   src={artifact.imageUrl}
                   alt={artifact.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  referrerPolicy="no-referrer"
+                  placeholderClassName="bg-cultural-sand"
                 />
                 <div className="absolute top-4 left-4">
                   <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium uppercase tracking-wider text-[#5A5A40]">
