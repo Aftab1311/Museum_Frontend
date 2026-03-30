@@ -1,5 +1,6 @@
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { ChatbotWidget } from "../components/ChatbotWidget";
 import { Outlet } from "react-router-dom";
 
 export function Layout() {
@@ -9,6 +10,7 @@ export function Layout() {
       <main className="flex-grow">
         <Outlet />
       </main>
+      <ChatbotWidget />
       <Footer />
     </div>
   );
