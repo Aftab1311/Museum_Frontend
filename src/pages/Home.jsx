@@ -421,7 +421,7 @@ export default function Home() {
             return (
               <Link
                 key={category.name}
-                to={`/gallery?category=${category.name}`}
+                to={`/gallery?category=${encodeURIComponent(category.name)}`}
                 className={`group relative overflow-hidden rounded-3xl ${getGridClass(i)}`}
               >
                 <div className="absolute inset-0 bg-[#2c2c1e]">

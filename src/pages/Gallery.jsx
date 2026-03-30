@@ -1,13 +1,49 @@
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { motion } from "motion/react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { Search, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { useArtifacts } from "../context/ArtifactContext";
 const ARTIFACTS_PER_PAGE = 4;
 
+const getCategoryFilterFromQuery = (searchParams, searchString) => {
+  const category = searchParams.get("category");
+  if (category && category.trim()) {
+    return category.trim();
+  }
+
+  // Fallback for malformed URLs like `?category=Music & Dance` where `&` was not encoded.
+  const query = searchString.startsWith("?") ? searchString.slice(1) : searchString;
+  if (!query) return null;
+
+  const params = query.split("&");
+  const categoryIndex = params.findIndex((param) =>
+    param.startsWith("category="),
+  );
+  if (categoryIndex === -1) return null;
+
+  let rawCategory = params[categoryIndex].slice("category=".length);
+  for (let index = categoryIndex + 1; index < params.length; index += 1) {
+    if (params[index].includes("=")) {
+      break;
+    }
+    rawCategory += `&${params[index]}`;
+  }
+
+  const plusToSpace = rawCategory.replace(/\+/g, " ");
+  try {
+    return decodeURIComponent(plusToSpace).trim() || null;
+  } catch {
+    return plusToSpace.trim() || null;
+  }
+};
+
 export default function Gallery() {
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const categoryFilter = searchParams.get("category");
+  const categoryFilter = useMemo(
+    () => getCategoryFilterFromQuery(searchParams, location.search),
+    [searchParams, location.search],
+  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTribe, setSelectedTribe] = useState(null);
